@@ -90,3 +90,24 @@ def parse_env_file(path: str) -> Dict[str, str]:
             return parse_env(fh.read())
     except (FileNotFoundError, PermissionError) as exc:
         raise type(exc)(f"Could not read .env file at {path!r}: {exc}") from exc
+
+
+def parse_env_string(text: str, override: Optional[Dict[str, str]] = None) -> Dict[str, str]:
+    """
+    Parse an .env-formatted string, optionally merging with existing values.
+
+    This is a convenience wrapper around ``parse_env`` that allows callers to
+    layer parsed values on top of an existing dictionary without mutating it.
+
+    Args:
+        text: Raw string content in .env format.
+        override: Optional base dictionary whose values are overridden by any
+                  keys present in *text*.  The original dict is never mutated.
+
+    Returns:
+        A new dictionary containing the merged key-value pairs.
+    """
+    parsed = parse_env(text)
+    if override is None:
+        return parsed
+    return {**override, **parsed}
