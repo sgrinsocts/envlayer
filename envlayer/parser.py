@@ -79,6 +79,14 @@ def parse_env_file(path: str) -> Dict[str, str]:
 
     Returns:
         Parsed key-value pairs.
+
+    Raises:
+        FileNotFoundError: If the file does not exist at the given path.
+        PermissionError: If the file cannot be read due to insufficient permissions.
+        ValueError: If the file contains invalid .env syntax.
     """
-    with open(path, 'r', encoding='utf-8') as fh:
-        return parse_env(fh.read())
+    try:
+        with open(path, 'r', encoding='utf-8') as fh:
+            return parse_env(fh.read())
+    except (FileNotFoundError, PermissionError) as exc:
+        raise type(exc)(f"Could not read .env file at {path!r}: {exc}") from exc
